@@ -4,34 +4,39 @@
 // You can also run a script with `npx hardhat run <script>`. If you do that, Hardhat
 // will compile your contracts, add the Hardhat Runtime Environment's members to the
 // global scope, and execute the script.
-const hre = require("hardhat");
 
-async function main() {
+task('deployContract', 'Deploy new contract')
+    .addParam('owner', 'the owner')
+    .setAction(async ({ owner }, hre) => {
   const currentTimestampInSeconds = Math.round(Date.now() / 1000);
   const unlockTime = currentTimestampInSeconds + 60;
 
   const lockedAmount = hre.ethers.utils.parseEther("0.001");
 
   const Lock = await hre.ethers.getContractFactory("Lock");
-  console.log('unlockTime', unlockTime)
   const lock = await Lock.deploy(
     unlockTime, 
-    "0xe2b9dCD2550025E8a010d232E828Da30a532b4a6", 
+    owner, 
     { value: lockedAmount }
     );
 
-  await lock.deployed();
+  await lock.deployed(60);
+  await lock.deployTransaction.wait(9)
 
   console.log(
     `Lock with ${ethers.utils.formatEther(
       lockedAmount
     )}ETH and unlock timestamp ${unlockTime} deployed to ${lock.address}`
   );
-}
 
-// We recommend this pattern to be able to use async/await everywhere
-// and properly handle errors.
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+
+  await hre.run("verify:verify", {
+    address: lock.address,
+    constructorArguments: [
+        unlockTime,
+        owner
+    ],
+  })
+
+  return lock.address
+})
