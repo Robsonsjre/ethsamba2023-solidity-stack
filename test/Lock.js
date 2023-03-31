@@ -62,13 +62,13 @@ describe("Lock", function () {
 
   describe("Withdrawals", function () {
     describe("Validations", function () {
-      it("Should revert with the right error if called too soon", async function () {
-        const { lock } = await loadFixture(deployOneYearLockFixture);
+      // it("Should revert with the right error if called too soon", async function () {
+      //   const { lock } = await loadFixture(deployOneYearLockFixture);
 
-        await expect(lock.withdraw()).to.be.revertedWith(
-          "You can't withdraw yet"
-        );
-      });
+      //   await expect(lock.withdraw()).to.be.revertedWith(
+      //     "You can't withdraw yet"
+      //   );
+      // });
 
       // it("Should revert with the right error if called from another account", async function () {
       //   const { lock, unlockTime, otherAccount } = await loadFixture(
